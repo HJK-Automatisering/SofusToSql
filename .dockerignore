@@ -1,0 +1,6 @@
+.git
+.github
+.vscode
+.env
+.env.example
+certs

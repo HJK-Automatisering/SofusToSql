@@ -1,0 +1,20 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspaces/SofusToSQL:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+  
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "12345678ABCabc$"
+      MSSQL_PID: "Developer"
+    volumes:
+      - sql-data:/var/opt/mssql
+
+volumes:
+  sql-data:
