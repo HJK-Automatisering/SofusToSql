@@ -1,11 +1,17 @@
+from database_handler import DatabaseHandler
 from sofus_api_client import SofusApiClient
-import json
 from dotenv import load_dotenv
 import os
+import logging
 
 
 def main():
     load_dotenv()
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
 
     CERT_PASSWORD = os.getenv("CERT_PASSWORD")
     if not CERT_PASSWORD:
@@ -18,29 +24,11 @@ def main():
         private_key_password=CERT_PASSWORD,
     )
 
-    # Temp code to inspect API responses
-    print("=== Organizations ===")
     orgs = client.get_organizations()
-    with open("organizations.json", "w") as f:
-        json.dump(orgs, f, indent=2)
-    for org in orgs:
-        print(f"  {org['name']} ({org['uuid']})")
+    orgs_info = [client.get_management_info(org["uuid"]) for org in orgs]
 
-    print()
-    for org in orgs:
-        print(f"=== Management Info: {org['name']} ===")
-        info = client.get_management_info(org["uuid"])
-        with open(f"management_info_{org['uuid']}.json", "w") as f:
-            json.dump(info, f, indent=2)
-        print(f"  Type: {info['metadata']['organization']['type']}")
-        print(f"  Generated: {info['metadata']['generated_at']}")
-
-        data = info["data"]
-        if "children" in data:
-            print(f"  Children: {len(data['children'])}")
-        if "admissions" in data:
-            print(f"  Admissions: {len(data['admissions'])}")
-        print()
+    db_engine = DatabaseHandler.get_db_engine()
+    DatabaseHandler.save_organizations_to_sql(db_engine, orgs_info)
 
 
 if __name__ == "__main__":

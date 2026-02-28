@@ -11,7 +11,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "12345678ABCabc$"
+      SA_PASSWORD: "12345678ABCabc@"
       MSSQL_PID: "Developer"
     volumes:
       - sql-data:/var/opt/mssql
